@@ -83,11 +83,14 @@ export default function Home() {
 
   const lang = LANGS[langKey];
   const { x, y, z, baseStr } = parts;
-  const pumped = lang.pump(x, y, z, i);
+  const pumpedY = y.repeat(i);
+  const pumped = x + pumpedY + z;
   const isValid = lang.check(pumped);
-  const xyValid = x.length + y.length <= p && y.length >= 1;
+  
+  // Dynamic Calculation
+  const currentXYLength = x.length + pumpedY.length;
+  const xyValid = currentXYLength <= p && y.length >= 1;
 
-  // --- Glass Bubble Node Component with Staggered Bounce ---
   const NodeGroup = ({ chars, label, theme, delayStart = 0 }) => {
     const themes = {
       violet: { border: "border-white/40", text: "text-violet-700", bg: "bg-white/20 shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)]", line: "bg-violet-500/50" },
@@ -143,12 +146,11 @@ export default function Home() {
       `}</style>
 
       <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 h-16 bg-white/30 backdrop-blur-xl rounded-full mt-4 mx-4 border border-white/50 shadow-lg">
-        <span className="text-xl font-black text-violet-600 tracking-widest uppercase">PUMPING LEMMA VISUALIZER</span>
+        <span className="text-xl font-black text-violet-600 tracking-widest uppercase">PUMP LEMMA VISUALIZER</span>
       </nav>
 
       <main className="pt-28 px-4 md:px-8 pb-8 flex flex-col md:flex-row gap-8 min-h-screen max-w-[1600px] mx-auto">
         <aside className="w-full md:w-80 flex flex-col gap-6 shrink-0">
-          {/* PARAMETERS PANEL */}
           <div className="bg-white/30 backdrop-blur-2xl rounded-[2rem] border-l border-t border-white/50 shadow-xl p-6 flex flex-col gap-6">
             <h2 className="uppercase text-xs tracking-widest text-violet-600 font-bold">Parameters</h2>
             <div className="space-y-4">
@@ -162,9 +164,6 @@ export default function Home() {
                   >
                     {Object.entries(LANGS).map(([key, val]) => <option key={key} value={key} className="bg-white text-slate-800">{val.label}</option>)}
                   </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40 text-violet-600">
-                    <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  </div>
                 </div>
               </div>
               <div className="space-y-2">
@@ -178,7 +177,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* CHECKLIST PANEL */}
           <div className="bg-white/30 backdrop-blur-2xl rounded-[2rem] border-l border-t border-white/50 shadow-xl p-6">
              <h2 className="uppercase text-xs tracking-widest text-violet-600 font-bold mb-4">Lemma Checklist</h2>
              <ul className="space-y-4">
@@ -186,12 +184,15 @@ export default function Home() {
                     <span className="w-5 h-5 flex items-center justify-center bg-emerald-500 text-white rounded-full text-[10px] shadow-sm">✓</span>
                     |y| ≥ 1 (Non-empty)
                 </li>
-                <li className={`flex items-center gap-3 text-xs font-bold transition-colors duration-300 ${xyValid ? 'text-emerald-600' : 'text-red-600'}`}>
-                    <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] text-white shadow-sm transition-colors ${xyValid ? 'bg-emerald-500' : 'bg-red-500'}`}>
-                        {xyValid ? '✓' : '✕'}
-                    </span>
-                    |xy| ≤ p ({x.length + y.length} ≤ {p})
+                {/* Rule 2 with Spin Effect */}
+                <li className={`flex items-center gap-3 text-xs font-bold transition-all duration-500 ${xyValid ? 'text-emerald-600' : 'text-red-600'}`}>
+                    <div className="relative w-5 h-5 transition-all duration-500" style={{ transform: xyValid ? 'rotateY(0deg)' : 'rotateY(180deg)', transformStyle: 'preserve-3d' }}>
+                        <span className="absolute inset-0 flex items-center justify-center bg-emerald-500 text-white rounded-full text-[10px] shadow-sm" style={{ backfaceVisibility: 'hidden' }}>✓</span>
+                        <span className="absolute inset-0 flex items-center justify-center bg-red-500 text-white rounded-full text-[10px] shadow-sm" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>✕</span>
+                    </div>
+                    |xyⁱ| ≤ p ({currentXYLength} ≤ {p})
                 </li>
+                {/* Rule 3 with Spin Effect */}
                 <li className={`flex items-center gap-3 text-xs font-bold transition-all duration-500 ${isValid ? 'text-emerald-600' : 'text-red-600'}`}>
                     <div className="relative w-5 h-5 transition-all duration-500" style={{ transform: isValid ? 'rotateY(0deg)' : 'rotateY(180deg)', transformStyle: 'preserve-3d' }}>
                         <span className="absolute inset-0 flex items-center justify-center bg-emerald-500 text-white rounded-full text-[10px] shadow-sm" style={{ backfaceVisibility: 'hidden' }}>✓</span>
@@ -204,21 +205,19 @@ export default function Home() {
         </aside>
 
         <section className="flex-1 flex flex-col gap-8 overflow-hidden">
-          {/* VISUALIZER STAGE */}
           <div className="bg-white/30 backdrop-blur-2xl border border-white/50 rounded-[2rem] p-8 shadow-xl relative overflow-hidden">
             <h1 className="text-2xl font-black mb-1">String Decomposition</h1>
-            <p className="text-xs font-medium text-slate-600 mb-8">Split: <span className="text-violet-600 font-bold uppercase">x</span> + <span className="text-[#6a37d4] font-bold uppercase">yⁱ</span> + <span className="text-slate-500 font-bold uppercase">z</span></p>
+            <p className="text-xs font-medium text-slate-600 mb-8 uppercase">Split: <span className="text-violet-600">x</span> + <span className="text-[#6a37d4] font-bold">yⁱ</span> + <span className="text-slate-500">z</span></p>
 
             <div className="w-full overflow-x-auto py-12 pb-6 [&::-webkit-scrollbar]:h-2.5 [&::-webkit-scrollbar-track]:bg-white/20 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-violet-400 [&::-webkit-scrollbar-thumb]:rounded-full">
               <div className="flex items-end gap-10 mx-auto w-max px-8">
                 <NodeGroup chars={x.split('')} label="X (PREFIX)" theme="violet" />
-                <NodeGroup chars={y.repeat(i).split('')} label={`Y${SUPS[i] || i} (PUMPED)`} theme="primary" delayStart={x.length} />
-                <NodeGroup chars={z.split('')} label="Z (SUFFIX)" theme="slate" delayStart={x.length + y.length * i} />
+                <NodeGroup chars={pumpedY.split('')} label={`Y${SUPS[i] || i} (PUMPED)`} theme="primary" delayStart={x.length} />
+                <NodeGroup chars={z.split('')} label="Z (SUFFIX)" theme="slate" delayStart={x.length + pumpedY.length} />
               </div>
             </div>
           </div>
 
-          {/* CONTROLS */}
           <div className="bg-white/30 backdrop-blur-2xl border border-white/50 rounded-[2rem] p-8 shadow-xl">
              <div className="flex flex-col xl:flex-row gap-12 items-center">
                 <div className="flex-1 w-full space-y-6">
@@ -226,21 +225,16 @@ export default function Home() {
                       <h3 className="font-bold text-xl">Iteration Control</h3>
                       <div className="text-[#6a37d4] font-black text-4xl">i = {i}</div>
                    </div>
-                   <input type="range" min="0" max="5" value={i} onChange={(e) => setI(parseInt(e.target.value))} className="w-full h-3 bg-white/50 rounded-full appearance-none cursor-pointer accent-[#6a37d4]" />
-                   <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">
-                      <span>Empty (0)</span>
-                      <span>Standard (1)</span>
-                      <span>Pumping (2-5)</span>
-                   </div>
+                   <input type="range" min="1" max="5" value={i} onChange={(e) => setI(parseInt(e.target.value))} className="w-full h-3 bg-white/50 rounded-full appearance-none cursor-pointer accent-[#6a37d4]" />
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full xl:w-auto font-bold text-center">
                    <div className="px-6 py-4 bg-white/40 border border-white/50 rounded-2xl shadow-sm"><div className="text-[9px] text-slate-500 uppercase">Length</div><div className="text-xl font-black">{pumped.length}</div></div>
                    <div className="px-6 py-4 bg-white/40 border border-white/50 rounded-2xl shadow-sm"><div className="text-[9px] text-slate-500 uppercase">P Val</div><div className="text-xl font-black">{p}</div></div>
-                   <div className={`px-6 py-4 border rounded-2xl shadow-md ${xyValid ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600' : 'bg-red-500/10 border-red-500/30 text-red-600'}`}>
-                      <div className="text-[9px] uppercase">|xy|≤p, |y|≥1</div>
+                   <div className={`px-6 py-4 border rounded-2xl shadow-md transition-all duration-300 ${xyValid ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600' : 'bg-red-500/10 border-red-500/30 text-red-600'}`}>
+                      <div className="text-[9px] uppercase">|xyⁱ| ≤ p</div>
                       <div className="text-xl font-black">{xyValid ? 'YES' : 'NO'}</div>
                    </div>
-                   <div className={`px-6 py-4 border rounded-2xl shadow-md ${isValid ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600' : 'bg-red-500/10 border-red-500/30 text-red-600'}`}>
+                   <div className={`px-6 py-4 border rounded-2xl shadow-md transition-all duration-300 ${isValid ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600' : 'bg-red-500/10 border-red-500/30 text-red-600'}`}>
                       <div className="text-[9px] uppercase">Valid in L</div>
                       <div className="text-xl font-black">{isValid ? 'YES' : 'NO'}</div>
                    </div>
@@ -248,24 +242,19 @@ export default function Home() {
              </div>
           </div>
 
-          {/* DYNAMIC ANALYSIS & FORMAL THEOREM */}
           <div className="grid lg:grid-cols-2 gap-8">
-             {/* UPDATED DYNAMIC ANALYSIS DIV (Matches Image) */}
              <div className={`bg-white/30 backdrop-blur-2xl rounded-[2.5rem] p-8 shadow-xl border-l-8 transition-all duration-500 flex flex-col justify-between ${isValid ? 'border-l-emerald-500' : 'border-l-red-500'}`}>
                 <div>
                   <h4 className="font-bold text-xl mb-6">Dynamic Analysis</h4>
                   <div className="space-y-6">
-                    <p className="text-sm font-medium">
-                      The resulting string is <span className="font-mono font-bold text-violet-700 bg-white/40 px-2 py-1 rounded shadow-sm">'{pumped}'</span>.
-                    </p>
+                    <p className="text-sm font-medium">The resulting string is <span className="font-mono font-bold text-violet-700 bg-white/40 px-2 py-1 rounded shadow-sm">'{pumped}'</span>.</p>
                     <p className="text-sm font-medium leading-relaxed">
                       {isValid 
                         ? `This string satisfies the condition. The condition for ${lang.label} is currently maintained.` 
-                        : <span>This string <span className="font-bold text-red-600">VIOLATES</span> the condition. This proves the language is <span className="font-bold text-red-600 text-base">NOT regular</span>.</span>}
+                        : <span>This string <span className="font-bold text-red-600 uppercase tracking-tight">Violates</span> the condition. This proves the language is <span className="font-bold text-red-600 text-base">NOT regular</span>.</span>}
                     </p>
                   </div>
                 </div>
-                
                 <div className="mt-8">
                   <div className={`inline-block px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm ${isValid ? 'bg-emerald-500/20 text-emerald-700' : 'bg-red-500/20 text-red-700'}`}>
                     {isValid ? "Condition Maintained" : "Pumping Lemma Disproved"}
@@ -273,7 +262,6 @@ export default function Home() {
                 </div>
              </div>
 
-             {/* FORMAL THEOREM BLOCK */}
              <div className="bg-white/30 backdrop-blur-2xl rounded-[2.5rem] p-8 border-l-8 border-l-violet-500 border-t border-r border-b border-white/50 shadow-xl">
               <h4 className="font-bold text-xl text-slate-800 mb-4">Formal Theorem</h4>
               <p className="text-sm text-slate-700 leading-relaxed font-medium">
