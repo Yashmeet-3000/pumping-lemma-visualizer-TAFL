@@ -87,9 +87,8 @@ export default function Home() {
   const pumped = x + pumpedY + z;
   const isValid = lang.check(pumped);
   
-  // Dynamic Calculation
-  const currentXYLength = x.length + pumpedY.length;
-  const xyValid = currentXYLength <= p && y.length >= 1;
+  const initialXYLength = x.length + y.length;
+  const isDecompositionValid = initialXYLength <= p && y.length >= 1;
 
   const NodeGroup = ({ chars, label, theme, delayStart = 0 }) => {
     const themes = {
@@ -184,15 +183,13 @@ export default function Home() {
                     <span className="w-5 h-5 flex items-center justify-center bg-emerald-500 text-white rounded-full text-[10px] shadow-sm">✓</span>
                     |y| ≥ 1 (Non-empty)
                 </li>
-                {/* Rule 2 with Spin Effect */}
-                <li className={`flex items-center gap-3 text-xs font-bold transition-all duration-500 ${xyValid ? 'text-emerald-600' : 'text-red-600'}`}>
-                    <div className="relative w-5 h-5 transition-all duration-500" style={{ transform: xyValid ? 'rotateY(0deg)' : 'rotateY(180deg)', transformStyle: 'preserve-3d' }}>
+                <li className={`flex items-center gap-3 text-xs font-bold transition-all duration-500 ${isDecompositionValid ? 'text-emerald-600' : 'text-red-600'}`}>
+                    <div className="relative w-5 h-5 transition-all duration-500" style={{ transform: isDecompositionValid ? 'rotateY(0deg)' : 'rotateY(180deg)', transformStyle: 'preserve-3d' }}>
                         <span className="absolute inset-0 flex items-center justify-center bg-emerald-500 text-white rounded-full text-[10px] shadow-sm" style={{ backfaceVisibility: 'hidden' }}>✓</span>
                         <span className="absolute inset-0 flex items-center justify-center bg-red-500 text-white rounded-full text-[10px] shadow-sm" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>✕</span>
                     </div>
-                    |xyⁱ| ≤ p ({currentXYLength} ≤ {p})
+                    |xy| ≤ p ({initialXYLength} ≤ {p})
                 </li>
-                {/* Rule 3 with Spin Effect */}
                 <li className={`flex items-center gap-3 text-xs font-bold transition-all duration-500 ${isValid ? 'text-emerald-600' : 'text-red-600'}`}>
                     <div className="relative w-5 h-5 transition-all duration-500" style={{ transform: isValid ? 'rotateY(0deg)' : 'rotateY(180deg)', transformStyle: 'preserve-3d' }}>
                         <span className="absolute inset-0 flex items-center justify-center bg-emerald-500 text-white rounded-full text-[10px] shadow-sm" style={{ backfaceVisibility: 'hidden' }}>✓</span>
@@ -220,23 +217,24 @@ export default function Home() {
 
           <div className="bg-white/30 backdrop-blur-2xl border border-white/50 rounded-[2rem] p-8 shadow-xl">
              <div className="flex flex-col xl:flex-row gap-12 items-center">
-                <div className="flex-1 w-full space-y-6">
-                   <div className="flex justify-between items-end">
-                      <h3 className="font-bold text-xl">Iteration Control</h3>
-                      <div className="text-[#6a37d4] font-black text-4xl">i = {i}</div>
+                <div className="flex-1 w-full space-y-10">
+                   {/* FIXED ALIGNMENT: items-baseline + whitespace-nowrap ensures i = 2 is one line and centered */}
+                   <div className="flex justify-between items-center mb-2">
+                      <h3 className="font-bold text-xl leading-none">Iteration Control</h3>
+                      <div className="text-[#6a37d4] font-black text-4xl leading-none whitespace-nowrap">i = {i}</div>
                    </div>
-                   <input type="range" min="1" max="5" value={i} onChange={(e) => setI(parseInt(e.target.value))} className="w-full h-3 bg-white/50 rounded-full appearance-none cursor-pointer accent-[#6a37d4]" />
+                   <input type="range" min="0" max="5" value={i} onChange={(e) => setI(parseInt(e.target.value))} className="w-full h-3 bg-white/50 rounded-full appearance-none cursor-pointer accent-[#6a37d4]" />
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full xl:w-auto font-bold text-center">
                    <div className="px-6 py-4 bg-white/40 border border-white/50 rounded-2xl shadow-sm"><div className="text-[9px] text-slate-500 uppercase">Length</div><div className="text-xl font-black">{pumped.length}</div></div>
                    <div className="px-6 py-4 bg-white/40 border border-white/50 rounded-2xl shadow-sm"><div className="text-[9px] text-slate-500 uppercase">P Val</div><div className="text-xl font-black">{p}</div></div>
-                   <div className={`px-6 py-4 border rounded-2xl shadow-md transition-all duration-300 ${xyValid ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600' : 'bg-red-500/10 border-red-500/30 text-red-600'}`}>
-                      <div className="text-[9px] uppercase">|xyⁱ| ≤ p</div>
-                      <div className="text-xl font-black">{xyValid ? 'YES' : 'NO'}</div>
+                   <div className={`px-6 py-4 border rounded-2xl shadow-md transition-all duration-300 ${isDecompositionValid ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600' : 'bg-red-500/10 border-red-500/30 text-red-600'}`}>
+                      <div className="text-[9px] uppercase leading-none mb-1">|xy| ≤ p (Initial)</div>
+                      <div className="text-xl font-black leading-none">{isDecompositionValid ? 'YES' : 'NO'}</div>
                    </div>
                    <div className={`px-6 py-4 border rounded-2xl shadow-md transition-all duration-300 ${isValid ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600' : 'bg-red-500/10 border-red-500/30 text-red-600'}`}>
-                      <div className="text-[9px] uppercase">Valid in L</div>
-                      <div className="text-xl font-black">{isValid ? 'YES' : 'NO'}</div>
+                      <div className="text-[9px] uppercase leading-none mb-1">Valid in L</div>
+                      <div className="text-xl font-black leading-none">{isValid ? 'YES' : 'NO'}</div>
                    </div>
                 </div>
              </div>
