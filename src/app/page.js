@@ -146,7 +146,7 @@ export default function Home() {
       `}</style>
 
       <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 h-16 bg-white/30 backdrop-blur-xl rounded-full mt-4 mx-4 border border-white/50 shadow-lg">
-        <span className="text-xl font-black text-violet-600 tracking-widest uppercase">PUMP LEMMA VISUALIZER</span>
+        <span className="text-xl font-black text-violet-600 tracking-widest uppercase">PUMPING LEMMA VISUALIZER</span>
       </nav>
 
       <main className="pt-28 px-4 md:px-8 pb-8 flex flex-col md:flex-row gap-8 min-h-screen max-w-[1600px] mx-auto">
