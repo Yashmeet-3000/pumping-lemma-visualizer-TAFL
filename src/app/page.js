@@ -87,6 +87,7 @@ export default function Home() {
   const pumped = x + pumpedY + z;
   const isValid = lang.check(pumped);
   
+  // Static Calculation based on initial split
   const initialXYLength = x.length + y.length;
   const isDecompositionValid = initialXYLength <= p && y.length >= 1;
 
@@ -181,14 +182,14 @@ export default function Home() {
              <ul className="space-y-4">
                 <li className="flex items-center gap-3 text-xs font-bold text-emerald-600">
                     <span className="w-5 h-5 flex items-center justify-center bg-emerald-500 text-white rounded-full text-[10px] shadow-sm">✓</span>
-                    |y| ≥ 1 (Non-empty)
+                    |y| ≥ 1 (Initial)
                 </li>
                 <li className={`flex items-center gap-3 text-xs font-bold transition-all duration-500 ${isDecompositionValid ? 'text-emerald-600' : 'text-red-600'}`}>
                     <div className="relative w-5 h-5 transition-all duration-500" style={{ transform: isDecompositionValid ? 'rotateY(0deg)' : 'rotateY(180deg)', transformStyle: 'preserve-3d' }}>
                         <span className="absolute inset-0 flex items-center justify-center bg-emerald-500 text-white rounded-full text-[10px] shadow-sm" style={{ backfaceVisibility: 'hidden' }}>✓</span>
                         <span className="absolute inset-0 flex items-center justify-center bg-red-500 text-white rounded-full text-[10px] shadow-sm" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>✕</span>
                     </div>
-                    |xy| ≤ p ({initialXYLength} ≤ {p})
+                    |xy| ≤ p (Initial)
                 </li>
                 <li className={`flex items-center gap-3 text-xs font-bold transition-all duration-500 ${isValid ? 'text-emerald-600' : 'text-red-600'}`}>
                     <div className="relative w-5 h-5 transition-all duration-500" style={{ transform: isValid ? 'rotateY(0deg)' : 'rotateY(180deg)', transformStyle: 'preserve-3d' }}>
@@ -218,8 +219,8 @@ export default function Home() {
           <div className="bg-white/30 backdrop-blur-2xl border border-white/50 rounded-[2rem] p-8 shadow-xl">
              <div className="flex flex-col xl:flex-row gap-12 items-center">
                 <div className="flex-1 w-full space-y-10">
-                   {/* FIXED ALIGNMENT: items-baseline + whitespace-nowrap ensures i = 2 is one line and centered */}
-                   <div className="flex justify-between items-center mb-2">
+                   {/* FIXED ALIGNMENT: items-baseline + whitespace-nowrap ensures i = {i} stays on one line */}
+                   <div className="flex justify-between items-baseline mb-2">
                       <h3 className="font-bold text-xl leading-none">Iteration Control</h3>
                       <div className="text-[#6a37d4] font-black text-4xl leading-none whitespace-nowrap">i = {i}</div>
                    </div>
